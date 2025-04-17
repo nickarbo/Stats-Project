@@ -1,7 +1,26 @@
 ---
-title: "Stats- Project"
-author: "Nick Arboscello and George Bujoreanu"
-date: "2025-04-17"
-output: pdf_document
+title: | 
+  STAT 516 Midterm 3: Course Project \vspace{0.25in}
+subtitle: |
+  Analysis Using R \vspace{0.25in}
+author: |
+  Nick Arboscello\hspace{0.25 in} George Bujoreanu
+  \vspace{0.25in}
+date: |
+  `r format(Sys.Date(), '%B %d, %Y')` \vspace{0.25in}
+output: 
+  pdf_document:
+    toc: true
+    number_sections: true
+    latex_engine: xelatex
+fontsize: 12pt
+geometry: margin=1in
 ---
+```{r setup, include= FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+test <- read.csv("C:/Users/nicka/OneDrive/Documents/stat516/Stats-Project/test.csv", header = T)
 
+```
+\newpage
+
+# Introduction
