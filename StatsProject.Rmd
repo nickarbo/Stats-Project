@@ -11,6 +11,7 @@ date: |
 output: 
   pdf_document:
     toc: true
+    toc_depth: 3
     number_sections: true
     latex_engine: xelatex
 fontsize: 12pt
@@ -24,3 +25,38 @@ test <- read.csv("C:/Users/nicka/OneDrive/Documents/stat516/Stats-Project/test.c
 \newpage
 
 # Introduction
+
+This project explores a marketing dataset from a Portuguese banking institution.  The dataset was collected during a direct marketing campaign promoting term deposit subscriptions and contains client-level information. Our analysis focuses on identifying key factors that influence a customer's decision to subscribe to a term deposit, providing insights into customer behavior and marketing effectiveness. https://www.kaggle.com/datasets/prakharrathi25/banking-dataset-marketing-targets?resource=download&select=test.csv
+
+This dataset was selected due to its practical relevance to business analytics and its alignment with our field of study in Computer Information Systems. The dataset's structure, which includes both numerical and categorical variables, enables the application of a variety of statistical methods to uncover meaningful relationships.
+
+## Variables
+
+Categorical Variables:
+
+ - job: Type of job (e.g., admin., technician, management)
+
+ - marital: Marital status (e.g., married, single, divorced)
+
+ - education: Highest education level attained (e.g., primary, secondary, tertiary)
+
+Numerical Variables:
+
+ - age: Age of the client (in years)
+
+ - duration: Duration of last contact in seconds
+
+ - balance: Account balance (in euros)
+
+Outcome Variable:
+
+y: Whether the client subscribed to a term deposit (yes or no)
+
+This subset of variables allows us to investigate how customer demographics and call characteristics relate to subscription behavior. Our analysis will address three focused research questions: (1) Is there a significant difference in account balance across different levels of education? This will be examined using a one-way ANOVA. (2) Is there an association between marital status and job type? We will explore this using a chi-square test of independence. (3) Does call duration significantly predict whether a client will subscribe to a term deposit? To answer this, we will use a logistic regression model with duration as the predictor and y (subscription) as the binary outcome.
+
+## Background
+
+Effective marketing strategies are crucial for financial institutions aiming to convert potential clients into long-term deposit holders. Direct marketing, particularly via telephone, remains a cost-effective yet complex channel, as it requires targeted efforts to engage the right clients at the right time. The dataset used in this project originates from a real-world marketing campaign by a Portuguese banking institution and has been the subject of academic research. Moro, Cortez, and Rita (2014) conducted a comprehensive analysis of this dataset, applying data mining techniques to develop predictive models for term deposit subscriptions. Their study, published in Decision Support Systems, demonstrated the value of using customer and call-related attributes—such as age, job type, and call duration—to forecast campaign success and improve targeting strategies. This research underscores the potential of data-driven approaches in banking and provides a foundation for our own statistical exploration using R.
+
+Reference:
+Moro, S., Cortez, P., & Rita, P. (2014). A data-driven approach to predict the success of bank telemarketing. Decision Support Systems, 62, 22–31. https://doi.org/10.1016/j.dss.2014.03.001
