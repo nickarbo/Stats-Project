@@ -1,0 +1,7 @@
+---
+title: "Stats- Project"
+author: "Nick Arboscello and George Bujoreanu"
+date: "2025-04-17"
+output: pdf_document
+---
+
