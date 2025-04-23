@@ -89,17 +89,6 @@ ggplot(test, aes(x = job, fill = marital)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Histogram of Call Duration Colored by Subscription Outcome
-ggplot(test, aes(x = duration, fill = y)) +
-  geom_histogram(position = "identity", bins = 30, alpha = 0.6) +
-  labs(
-    title = "Distribution of Call Duration by Subscription Outcome",
-    x = "Call Duration (Seconds)",
-    y = "Frequency",
-    fill = "Subscribed"
-  ) +
-  theme_minimal()
-
 # Summary statistics
 summary(test[, c("age", "balance", "duration")])
 
