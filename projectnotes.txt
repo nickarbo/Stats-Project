@@ -1,0 +1,24 @@
+structure is good
+
+title and contributions
+
+no y on outcome variable
+
+put references at end of paper
+
+account balance graph on EDA, don't need distribution title
+
+4/5 job types!!!
+
+2 graphs for EDA
+
+no missing data show that
+
+do not say first research question asks
+
+kruskal wallis - anova for first question, look in notes
+
+logistic need to build 2 models, first model we have is good
+
+
+
