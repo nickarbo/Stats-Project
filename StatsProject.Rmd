@@ -3,16 +3,16 @@ title: |
   Demographics and Account Balances: A Statistical Analysis of Client Behavior \vspace{0.25in}
 author: |
   Nick Arboscello 50%\hspace{0.25 in} George Bujoreanu 50% \vspace{0.25in}
-date: "`r format(Sys.Date(), '%B %d, %Y')` \vspace{0.25in}"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
-  word_document:
-    toc: true
-    toc_depth: 6
   pdf_document:
     toc: true
     toc_depth: 6
     number_sections: true
     latex_engine: xelatex
+  word_document:
+    toc: true
+    toc_depth: 6
 subtitle: |
   Analysis Using R \vspace{0.25in}
 fontsize: 12pt
@@ -23,7 +23,7 @@ geometry: margin=1in
 knitr::opts_chunk$set(echo = TRUE)
 
 # Load test.csv from the same folder as the Rmd file
-test <- read.csv("test.csv", header = TRUE)
+test <- read.csv("C:/Users/nicka/OneDrive/Documents/stat516/Stats-Project/test.csv", header = T)
 
 ```
 \newpage
@@ -68,21 +68,22 @@ The goal of our exploratory data analysis is to uncover general trends, patterns
 
 ```{r, warning=FALSE, message=FALSE, fig.width=4.5, fig.height=3}
 # Bar Chart: Mean Account Balance by Education Level
+# Bar Chart: Median Account Balance by Education Level
 library(ggplot2)
 library(dplyr)
 
-# Calculate mean balance per education level
-edu_balance <- test %>%
+# Calculate median balance per education level
+edu_balance_median <- test %>%
   group_by(education) %>%
-  summarise(mean_balance = mean(balance))
+  summarise(median_balance = median(balance))
 
 # Plot
-ggplot(edu_balance, aes(x = education, y = mean_balance)) +
+ggplot(edu_balance_median, aes(x = education, y = median_balance)) +
   geom_col(fill = "steelblue") +
   labs(
-    title = "Average Account Balance by Education Level",
+    title = "Median Account Balance by Education Level",
     x = "Education Level",
-    y = "Average Balance (Euros)"
+    y = "Median Balance (Euros)"
   ) +
   theme_minimal()
 
@@ -124,21 +125,19 @@ print(job_summary)
 
  **Discussion**
  
- After filtering and cleaning the dataset, we verified that there are no missing values across any of the variables. This ensures that our statistical analyses are not biased due to incomplete data and that no imputation or further cleaning was necessary at this stage. Additionally, we restricted the dataset to only include clients with positive account balances as well as only 5 job types, removing potential distortions from overdrafts or debt-related outliers.
+After filtering and cleaning the dataset, we verified that there were no missing values across any variables. This ensured that our statistical analyses were not biased due to incomplete data and that no imputation or further cleaning was necessary. Additionally, we restricted the dataset to clients with positive account balances and limited the analysis to five major job types to remove potential distortions from overdrafts or debt-related outliers.
 
-The bar chart of average account balance by education level shows that clients with tertiary education tend to have the highest average balances, followed closely by those with secondary education. Those with an unknown education level show the lowest average. This pattern may reflect the influence of educational attainment on financial outcomes such as income and savings, and supports further exploration of this relationship using ANOVA.
+The bar chart of median account balance by education level shows that clients with tertiary education have the highest median balances, followed closely by those with primary education. Clients with unknown education levels had the lowest medians. This pattern suggests that educational attainment may influence financial outcomes, such as savings, although the relationship appears somewhat complex and justifies further statistical investigation.
 
-The bar plot of job type by marital status reveals distinct social patterns. Jobs such as “blue-collar” and “management” dominate the distribution, especially among married individuals. In contrast, roles such as “student,” “retired,” and “unemployed” appear less frequently but are more varied across marital statuses. These observed differences suggest potential associations between employment type and relationship status, motivating the use of chi-square tests to assess the significance of these categorical relationships.
+The bar plot of job type by marital status reveals distinct social patterns. "Blue-collar" and "management" positions dominate the distribution, especially among married individuals. Meanwhile, roles such as "student," "retired," and "unemployed" appear less frequently but are more varied across marital statuses. These observed differences suggest potential associations between employment type and relationship status, motivating the use of chi-square tests to assess the significance of these categorical relationships.
 
 Summary Statistics Table:
 
-- Education: Most clients report either secondary or tertiary education. The "unknown" category appears less frequently but notably has the lowest average account balance.
+ - Education: Most clients report either secondary or tertiary education. The "unknown" group appears less frequently and has the lowest median account balance.
 
-- Balance: Account balances are all positive in this cleaned dataset, with an average of €1,634 and a broad range, indicating significant financial variability among clients.
+ - Balance: Account balances are all positive, with a broad range indicating significant financial variability among clients.
 
-- Job Type: "Blue-collar" and "management" roles dominate the sample, particularly among married clients, while “student” and “unemployed” statuses are less common but still represented across all marital groups.
- 
- 
+ - Job Type: "Blue-collar" and "management" roles dominate the sample, particularly among married clients, while "student" and "unemployed" statuses are less common but present across all marital groups.
 
 # Research Questions
 
@@ -172,13 +171,13 @@ test %>%
   )
 
 # Q-Q plots for each education group
-par(mfrow = c(1, 3))  # Layout 3 per row
+par(mfrow = c(1, 3))
 edu_levels <- unique(test$education)
 for (lvl in edu_levels) {
   qqnorm(test$balance[test$education == lvl], main = paste("Q-Q Plot:", lvl))
   qqline(test$balance[test$education == lvl])
 }
-par(mfrow = c(1, 1))  # Reset layout
+par(mfrow = c(1, 1))  
 
 leveneTest(balance ~ education, data = test)
 
@@ -187,7 +186,7 @@ kruskal.test(balance ~ education, data = test)
 
 ```
 
-To determine whether account balances differed significantly across education levels, we initially considered a one-way ANOVA. However, upon testing the required assumptions, we found violations that made ANOVA inappropriate. Specifically, Levene’s Test for homogeneity of variances produced a p-value of 0.9094, indicating no significant difference in variances — but visual inspection via Q-Q plots showed clear departures from normality, especially due to skewed balance distributions and extreme values. As a result, we employed the Kruskal-Wallis rank sum test, a non-parametric alternative that does not assume normality.
+To determine whether account balances differed significantly across education levels, we initially considered a one-way ANOVA. However, upon testing the required assumptions, we found violations that made ANOVA inappropriate. Specifically, Levene’s Test for homogeneity of variances produced a p-value of 0.9094, indicating no significant difference in variances but visual inspection via Q-Q plots showed clear departures from normality, especially due to skewed balance distributions and extreme values. As a result, we employed the Kruskal-Wallis rank sum test, a non-parametric alternative that does not assume normality.
 
 The Kruskal-Wallis test returned a chi-squared value of 3.5147 with 3 degrees of freedom and a p-value of 0.3189. Since this p-value exceeds the conventional significance threshold of 0.05, we conclude that there is no statistically significant difference in account balance distributions across education levels. Thus, the data do not provide strong evidence that financial behavior, as measured by balance, systematically varies with educational attainment.
 
@@ -195,11 +194,9 @@ The Kruskal-Wallis test returned a chi-squared value of 3.5147 with 3 degrees of
 library(dplyr)
 
 table_marital_job <- table(test$marital, test$job)
-table_marital_job
 
 # Check expected cell counts
 chisq_test <- chisq.test(table_marital_job)
-chisq_test$expected
 
 # Chi-square test of independence
 chisq_test
@@ -254,36 +251,19 @@ boxplot(test$duration, main = "Boxplot of Call Duration", ylab = "Seconds")
 
 ```
 
-We fit two logistic regression models to predict the probability that a client would subscribe to a term deposit.
-
-The first model used call duration only as the predictor. The model output shows that the coefficient for duration is 0.00321 with a standard error of 0.00054, and a p-value of 2.3e-09, indicating the relationship is statistically significant at the 5% level. This suggests that as call duration increases, so does the likelihood of subscription.
-
-The exponentiated coefficient (odds ratio) for duration is approximately 1.0032, meaning that for every one-second increase in call duration, the odds of subscribing increase by about 0.32%. The 95% confidence interval for the odds ratio (1.0022 to 1.0043) further supports the statistical significance of this relationship.
-The model’s residual deviance decreased from 307.88 (null model) to 269.28, and the AIC value was 273.28, providing a baseline for comparison.
-
-To explore potential improvement, we fit a second logistic regression model that included both call duration and client age as predictors. In this model, call duration remained a highly statistically significant predictor (p < 0.001), and client age was also statistically significant (p = 0.0267).
-The odds ratio for call duration was approximately 1.0034, meaning that for every one-second increase in call duration, the odds of subscription increase by about 0.34%.
-The odds ratio for age was approximately 0.962, indicating that each additional year of age is associated with about a 3.8% decrease in the odds of subscribing. The 95% confidence interval for the odds ratio for age (0.928 to 0.995) did not contain 1, supporting its statistical significance.
-
-When comparing models, the AIC for the second model was 270.02, which is lower than the first model's AIC of 273.28. Since a lower AIC indicates a better model, we conclude that adding age to the model improved the fit to the data.
-
-The relationship between call duration and the logit of the outcome continued to appear approximately linear, validating a key assumption of logistic regression. The boxplot of call duration shows several high outliers (above 1500 seconds), but most call durations were concentrated below 500 seconds. These outliers were not removed, as logistic regression tends to be robust to moderate outliers with a reasonable sample size.
-
-Overall, based on the lower AIC value and the statistical significance of both predictors, we recommend the second model, which includes both call duration and age, as the better model for predicting client subscription behavior. Longer calls and younger client ages are both associated with greater odds of success in the bank’s marketing campaign, highlighting the combined importance of engagement and demographic characteristics in marketing strategies.
+We fit two logistic regression models to predict the probability of client subscription. The first model, using call duration only, showed that longer calls significantly increased subscription odds by about 0.32% per second (odds ratio ~1.0032, 95% CI: 1.0022–1.0043). The second model added client age as a predictor; here, longer calls remained significant, and each additional year of age reduced subscription odds by about 3.8% (odds ratio ~0.962, 95% CI: 0.928–0.995). Model comparison via AIC favored the second model (270.02 vs. 273.28), indicating improved fit. Visual checks supported the assumption of linearity, and although a few long-duration outliers existed, they were retained given logistic regression’s robustness. Overall, longer call duration and younger age both increased the likelihood of subscription, emphasizing the importance of engagement and client demographics in marketing strategies.
 
 # Discussion and Conclusion
 
-This project investigated how client demographics and marketing interaction characteristics influenced the likelihood of subscribing to a term deposit during a bank’s marketing campaign. We addressed three research questions focused on the relationship between education and account balance, marital status and job type, and the predictive power of call duration on subscription outcome.
+This project investigated how client demographics and marketing interaction characteristics influenced the likelihood of subscribing to a term deposit during a bank’s marketing campaign. We addressed three research questions focused on the relationship between education and account balance, marital status and job type, and the predictive power of call duration and age on subscription outcome.
 
-The key findings are as follows: First, we found no statistically significant difference in account balance across education levels based on the Kruskal-Wallis test. Although clients with tertiary education had slightly higher median balances, the differences were not large enough to be considered statistically significant. This suggests that, in our sample, education level alone may not be a strong predictor of financial outcomes like account balance.
-
-Second, we did find a statistically significant association between marital status and job type using a Chi-square test of independence. This result indicates that these two demographic variables are not independent, potentially reflecting underlying socioeconomic patterns that influence both relationship status and employment types. Third, logistic regression analysis confirmed that call duration was a significant predictor of whether a client subscribed. Although the effect size per second was small, the overall trend indicated that longer calls were associated with higher probabilities of conversion—a practical insight for marketing strategy optimization.
+The key findings are as follows: First, there was no statistically significant difference in account balances across education levels based on the Kruskal-Wallis test, suggesting education alone may not strongly predict financial outcomes. Second, we found a statistically significant association between marital status and job type using a Chi-square test of independence, indicating that these demographic variables are not independent. Third, longer call durations and younger client ages were both associated with greater odds of subscription. In particular, each additional second of call duration increased subscription odds by approximately 0.32%–0.34%, while each additional year of age reduced odds by about 3.8%. Model comparison favored including both duration and age, as evidenced by a lower AIC.
 
 These results are consistent with prior literature, notably Moro et al. (2014), which found that variables such as job, education, and call characteristics are valuable predictors in marketing models. Our findings further support the idea that personalized and data-informed engagement strategies can enhance campaign effectiveness.
 
-Despite the strengths of our analysis, there are a few limitations to note. While Levene’s Test indicated equal variances across education groups, visual inspection of the balance data revealed violations of the normality assumption, prompting us to use the Kruskal-Wallis test instead of ANOVA. Additionally, although the Chi-square test assumptions were generally met, a few expected cell counts were close to or below 5. However, the overall size of the sample and the contingency table helps mitigate concerns about the accuracy of the approximation.
+Despite the strengths of our analysis, there are a few limitations to note. Visual inspection of balance data revealed violations of the normality assumption, prompting the use of the Kruskal-Wallis test instead of ANOVA. Additionally, although Chi-square test assumptions were generally met, a few expected cell counts were close to or below 5, though the large sample size mitigates major concerns.
 
-Future work could involve building a multivariate logistic regression model incorporating demographic and financial variables alongside call duration to better capture the complexity of customer behavior. Further analysis might also consider interaction effects (e.g., between job and education) and explore predictive modeling techniques such as decision trees or ensemble methods to compare performance. Finally, handling potential outliers or modeling non-linear relationships (e.g., duration thresholds) could refine future insights.
+Future work could involve building more complex multivariate logistic regression models incorporating additional demographic and financial variables, exploring interaction effects, and using predictive techniques like decision trees or ensemble methods. Further, handling outliers and modeling potential non-linear relationships could refine future insights.
 
 In conclusion, this project demonstrates that statistical analysis of marketing data can yield actionable insights. Our results reinforce the importance of understanding customer profiles and behavioral indicators to optimize outreach strategies in financial services.
 
