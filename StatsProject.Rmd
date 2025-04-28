@@ -1,25 +1,29 @@
 ---
-title: | 
+title: |
   Demographics and Account Balances: A Statistical Analysis of Client Behavior \vspace{0.25in}
-subtitle: |
-  Analysis Using R \vspace{0.25in}
 author: |
-  Nick Arboscello 50%\hspace{0.25 in} George Bujoreanu 50%
-  \vspace{0.25in}
-date: |
-  `r format(Sys.Date(), '%B %d, %Y')` \vspace{0.25in}
-output: 
+  Nick Arboscello 50%\hspace{0.25 in} George Bujoreanu 50% \vspace{0.25in}
+date: "`r format(Sys.Date(), '%B %d, %Y')` \vspace{0.25in}"
+output:
+  word_document:
+    toc: true
+    toc_depth: 6
   pdf_document:
     toc: true
     toc_depth: 6
     number_sections: true
     latex_engine: xelatex
+subtitle: |
+  Analysis Using R \vspace{0.25in}
 fontsize: 12pt
 geometry: margin=1in
 ---
-```{r setup, include= FALSE}
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-test <- read.csv("C:/Users/nicka/OneDrive/Documents/stat516/Stats-Project/test.csv", header = T)
+
+# Load test.csv from the same folder as the Rmd file
+test <- read.csv("test.csv", header = TRUE)
 
 ```
 \newpage
@@ -141,7 +145,9 @@ Summary Statistics Table:
 In this study, we aim to investigate how client demographics and marketing-related characteristics influence financial behaviors and outcomes within the context of a direct marketing campaign conducted by a Portuguese bank. We developed three focused research questions that align with the available data and allow us to explore both behavioral and statistical relationships. These questions were chosen to guide a meaningful and data-driven analysis that connects demographic patterns to marketing effectiveness and customer decisions.
 
 **Question 1:** Is there a significant difference in account balance across different levels of education? This question is grounded in the idea that education level may correlate with financial literacy, income, and overall financial stability. Higher educational attainment may be associated with higher-paying jobs and better money management, potentially leading to greater bank balances. To test this, we will use a one-way Analysis of Variance (ANOVA), which is suitable for comparing the means of a continuous variable (account balance) across more than two independent groups (education levels). ANOVA allows us to determine whether the differences in mean balance between the education categories—such as primary, secondary, and tertiary—are statistically significant.
+
 **Question 2:** Is there an association between marital status and job type? This question explores potential demographic and occupational relationships. For example, certain job types may be more common among married individuals, while others may be prevalent among singles due to lifestyle choices or economic factors. Understanding these patterns can inform both customer profiling and targeted marketing strategies. To evaluate this question, we will use a chi-square test of independence. This statistical test is appropriate for determining if marital status and job type are associated or independent from one another. It helps identify whether the observed distribution of job types varies significantly across different marital status groups.
+
 **Question 3:** Does call duration significantly predict whether a client will subscribe to a term deposit? This question is rooted in the hypothesis that longer calls may indicate greater client interest, engagement, or persuasion success. As call duration increases, we may expect the likelihood of a positive response to the marketing effort (i.e., a subscription) to also increase. To test this, we will apply a logistic regression model, where the binary outcome variable is whether or not the client subscribed (y), and the predictor variable is call duration. Logistic regression is the appropriate method when the goal is to model the probability of a binary outcome based on one or more predictor variables. It will allow us to quantify the relationship between call length and subscription likelihood, and assess whether this relationship is statistically significant.
 
 
@@ -209,24 +215,29 @@ This finding supports our second research question and suggests that an individu
 # Ensure y is a binary factor
 test$y <- factor(test$y, levels = c("no", "yes"))
 
-# Fit logistic regression model
-model_logit <- glm(y ~ duration, data = test, family = binomial)
+# Fit logistic regression model with duration only
+model_duration <- glm(y ~ duration, data = test, family = binomial)
 
-# View model summary
-summary(model_logit)
+# Fit a second logistic regression model with duration and age
+model_duration_age <- glm(y ~ duration + age, data = test, family = binomial)
 
-# Exponentiate the coefficient to get odds ratio
-exp(coef(model_logit))
+# View model summaries
+summary(model_duration)
+summary(model_duration_age)
 
-# Get confidence intervals for odds ratio
-exp(confint(model_logit))
-# Check levels of response variable
-levels(test$y)
+# Exponentiate the coefficients to get odds ratios
+exp(coef(model_duration))
+exp(coef(model_duration_age))
 
-# Should return: "no" "yes"
+# Get confidence intervals for odds ratios
+exp(confint(model_duration))
+exp(confint(model_duration_age))
 
-# Create logit (log odds)
-test$logit <- log(predict(model_logit, type = "response") / (1 - predict(model_logit, type = "response")))
+# Compare AIC values
+AIC(model_duration, model_duration_age)
+
+# Create logit (log odds) for Model 2 (duration + age)
+test$logit <- log(predict(model_duration_age, type = "response") / (1 - predict(model_duration_age, type = "response")))
 
 # Smoothed plot: logit vs. duration
 library(ggplot2)
@@ -243,15 +254,22 @@ boxplot(test$duration, main = "Boxplot of Call Duration", ylab = "Seconds")
 
 ```
 
-We fit a logistic regression model using call duration to predict the probability that a client would subscribe to a term deposit. The model output shows that the coefficient for duration is 0.00355 with a standard error of 0.00017, and a p-value < 2e-16, indicating the relationship is statistically significant at the 5% level. This suggests that as call duration increases, so does the likelihood of subscription. 
+We fit two logistic regression models to predict the probability that a client would subscribe to a term deposit.
 
-The exponentiated coefficient (odds ratio) for duration is approximately 1.0036, meaning that for every one-second increase in call duration, the odds of subscribing increase by 0.36%. While this effect is small per second, longer call durations compound the impact. The model’s residual deviance decreased from 3231.0 (null model) to 2701.8, suggesting improved model fit. The AIC of 2705.8 can be used to compare this model with future models including multiple predictors.
+The first model used call duration only as the predictor. The model output shows that the coefficient for duration is 0.00321 with a standard error of 0.00054, and a p-value of 2.3e-09, indicating the relationship is statistically significant at the 5% level. This suggests that as call duration increases, so does the likelihood of subscription.
 
-The relationship appears approximately linear, which supports the assumption that the logit of the outcome is linearly related to the continuous predictor (duration). This validates one of the key assumptions of logistic regression.
+The exponentiated coefficient (odds ratio) for duration is approximately 1.0032, meaning that for every one-second increase in call duration, the odds of subscribing increase by about 0.32%. The 95% confidence interval for the odds ratio (1.0022 to 1.0043) further supports the statistical significance of this relationship.
+The model’s residual deviance decreased from 307.88 (null model) to 269.28, and the AIC value was 273.28, providing a baseline for comparison.
 
-The boxplot reveals several high outliers in duration (e.g., above 1500 seconds), but the distribution is largely concentrated below 500 seconds. These outliers are not necessarily problematic, but they should be noted. Since logistic regression is somewhat robust to moderate outliers, especially in large samples, we proceeded without removing them. If needed, we could explore sensitivity analysis by trimming or winsorizing the top 1–2%.
+To explore potential improvement, we fit a second logistic regression model that included both call duration and client age as predictors. In this model, call duration remained a highly statistically significant predictor (p < 0.001), and client age was also statistically significant (p = 0.0267).
+The odds ratio for call duration was approximately 1.0034, meaning that for every one-second increase in call duration, the odds of subscription increase by about 0.34%.
+The odds ratio for age was approximately 0.962, indicating that each additional year of age is associated with about a 3.8% decrease in the odds of subscribing. The 95% confidence interval for the odds ratio for age (0.928 to 0.995) did not contain 1, supporting its statistical significance.
 
-The model results and diagnostic plots together support the conclusion that call duration is a statistically significant and meaningful predictor of whether a client subscribes. Longer calls are associated with greater odds of success in the bank’s marketing campaign, supporting the value of customer engagement duration in predicting outcomes.
+When comparing models, the AIC for the second model was 270.02, which is lower than the first model's AIC of 273.28. Since a lower AIC indicates a better model, we conclude that adding age to the model improved the fit to the data.
+
+The relationship between call duration and the logit of the outcome continued to appear approximately linear, validating a key assumption of logistic regression. The boxplot of call duration shows several high outliers (above 1500 seconds), but most call durations were concentrated below 500 seconds. These outliers were not removed, as logistic regression tends to be robust to moderate outliers with a reasonable sample size.
+
+Overall, based on the lower AIC value and the statistical significance of both predictors, we recommend the second model, which includes both call duration and age, as the better model for predicting client subscription behavior. Longer calls and younger client ages are both associated with greater odds of success in the bank’s marketing campaign, highlighting the combined importance of engagement and demographic characteristics in marketing strategies.
 
 # Discussion and Conclusion
 
