@@ -245,10 +245,13 @@ ggplot(test, aes(x = duration, y = logit)) +
        x = "Call Duration (seconds)",
        y = "Logit (log odds)") +
   theme_minimal()
+```
+
+```{r fig.width=3, fig.height=4}
+
 
 # Boxplot of call duration
 boxplot(test$duration, main = "Boxplot of Call Duration", ylab = "Seconds")
-
 ```
 
 We fit two logistic regression models to predict the probability of client subscription. The first model, using call duration only, showed that longer calls significantly increased subscription odds by about 0.32% per second (odds ratio ~1.0032, 95% CI: 1.0022–1.0043). The second model added client age as a predictor; here, longer calls remained significant, and each additional year of age reduced subscription odds by about 3.8% (odds ratio ~0.962, 95% CI: 0.928–0.995). Model comparison via AIC favored the second model (270.02 vs. 273.28), indicating improved fit. Visual checks supported the assumption of linearity, and although a few long-duration outliers existed, they were retained given logistic regression’s robustness. Overall, longer call duration and younger age both increased the likelihood of subscription, emphasizing the importance of engagement and client demographics in marketing strategies.
